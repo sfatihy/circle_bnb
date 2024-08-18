@@ -13,13 +13,15 @@ class CircleBNB extends StatefulWidget {
   final List<Color> colorList;
   final double dragSpeed;
   final List<String> dataList;
+  final Function (int index) onChangeIndex;
 
   const CircleBNB({
     super.key,
     required this.size,
     required this.colorList,
     required this.dragSpeed,
-    required this.dataList
+    required this.dataList,
+    required this.onChangeIndex
   });
 
   @override
@@ -32,10 +34,9 @@ class _CircleBNBState extends State<CircleBNB> {
 
   late List<double> angleListPi;
   late List<double> angleListPi2;
+  late int topIndex;
 
   double data = 0.0;
-
-  int topIndex = 0;
 
   late DragStartDetails detailsVar;
 
@@ -47,6 +48,7 @@ class _CircleBNBState extends State<CircleBNB> {
     super.initState();
 
     circleBNB = CircleBNBModel();
+    topIndex = 0;
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -74,16 +76,16 @@ class _CircleBNBState extends State<CircleBNB> {
           if ((angleListPi2[i] - aradaki_fark < data && data < angleListPi2[i]) || (-angleListPi2[8-i] - aradaki_fark < data && data < -angleListPi2[8-i])) {
             topIndex = 8-i;
             if(topIndex == 0) data = 0;
-            log("${data} -> ${topIndex}");
+            //log("${data} -> ${topIndex}");
           }
           else if ((angleListPi2[8] - aradaki_fark < data && data < angleListPi2[8]) || (topIndex == 1 && angleListPi2[0] - aradaki_fark < data && data < angleListPi2[0])) {
             topIndex = 0;
-            log("${data} -> ${topIndex}");
+            //log("${data} -> ${topIndex}");
             data = 0;
-            log("Data dönme değeri 0 landı.");
+            //log("Data dönme değeri 0 landı.");
           }
           else {
-            log(data.toString());
+            //log(data.toString());
           }
         }
         
@@ -96,26 +98,27 @@ class _CircleBNBState extends State<CircleBNB> {
           if ((angleListPi2[i] - aradaki_fark < data && data < angleListPi2[i]) || (-angleListPi2[8-i] - aradaki_fark < data && data < -angleListPi2[8-i])) {
             topIndex = 8-i;
             if(topIndex == 0) data = 0;
-            log("${data} -> ${topIndex}");
+            //log("${data} -> ${topIndex}");
           }
           else if ((topIndex == 7 && angleListPi2[0] < data && data < angleListPi2[0] + aradaki_fark) || (-angleListPi2[8] < data && data < -angleListPi2[8] + aradaki_fark)) {
             topIndex = 0;
-            log("${data} -> ${topIndex}");
+            //log("${data} -> ${topIndex}");
             data = 0;
-            log("Data dönme değeri 0 landı.");
+            //log("Data dönme değeri 0 landı.");
           }
           else {
-            log(data.toString());
+            //log(data.toString());
           }
         }
       }
+      widget.onChangeIndex(topIndex);
     });
   }
 
   _clickState (clickedIndex) {
 
-    log("TopIndex: $topIndex");
-    log("Index: $clickedIndex");
+    //log("TopIndex: $topIndex");
+    //log("Index: $clickedIndex");
 
     setState(() {
 
@@ -132,6 +135,8 @@ class _CircleBNBState extends State<CircleBNB> {
       }
 
       topIndex = clickedIndex;
+
+      widget.onChangeIndex(topIndex);
     });
   }
 
@@ -149,9 +154,9 @@ class _CircleBNBState extends State<CircleBNB> {
             GestureDetector(
               dragStartBehavior: DragStartBehavior.start,
               onHorizontalDragStart: (details) {
-                log("**");
-                log(details.toString());
-                log("**");
+                //log("**");
+                //log(details.toString());
+                //log("**");
 
                 setState(() {
                   isDone = false;
@@ -164,7 +169,7 @@ class _CircleBNBState extends State<CircleBNB> {
               onHorizontalDragEnd: ((details) {
                 setState(() {
                   isDone = true;
-                  log("Drag End : ${angleListPi.length - topIndex}" );
+                  //log("Drag End : ${angleListPi.length - topIndex}" );
                   data = angleListPi[angleListPi.length - topIndex > 7 ? 0 : angleListPi.length - topIndex];
                   //data = double.parse("${angleListPi.length - topIndex}");
                 });
