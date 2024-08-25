@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 
 import 'package:circle_bnb/clipper/circle_bnb_clipper.dart';
+import 'package:circle_bnb/model/circle_bnb_item_model.dart';
 import 'package:circle_bnb/model/circle_bnb_model.dart';
 
 class CircleBNB extends StatefulWidget {
@@ -12,7 +13,7 @@ class CircleBNB extends StatefulWidget {
   final Size size;
   final List<Color>? colorList;
   final double dragSpeed;
-  final List<String> dataList;
+  final List<CircleBNBItem> items;
   final Function (int index) onChangeIndex;
 
   const CircleBNB({
@@ -20,7 +21,7 @@ class CircleBNB extends StatefulWidget {
     required this.size,
     this.colorList,
     required this.dragSpeed,
-    required this.dataList,
+    required this.items,
     required this.onChangeIndex
   }) : assert(colorList == null || colorList.length == 4, 'colorList must be null or have more than 4 elements.');
 
@@ -48,7 +49,7 @@ class _CircleBNBState extends State<CircleBNB> {
   void initState() {
     super.initState();
 
-    circleBNB = CircleBNBModel(widget.dataList.length);
+    circleBNB = CircleBNBModel(widget.items.length);
     topIndex = 0;
 
     SystemChrome.setPreferredOrientations([
@@ -79,13 +80,13 @@ class _CircleBNBState extends State<CircleBNB> {
       if (details.localPosition.dx.floorToDouble() > detailsVar.localPosition.dx.floorToDouble()) {
         data = data + widget.dragSpeed;
 
-        for (int i = 1; i <= widget.dataList.length; i++) {
-          if ((angleListPi2[i] - aradaki_fark < data && data < angleListPi2[i]) || (-angleListPi2[widget.dataList.length-i] - aradaki_fark < data && data < -angleListPi2[widget.dataList.length-i])) {
-            topIndex = widget.dataList.length-i;
+        for (int i = 1; i <= widget.items.length; i++) {
+          if ((angleListPi2[i] - aradaki_fark < data && data < angleListPi2[i]) || (-angleListPi2[widget.items.length-i] - aradaki_fark < data && data < -angleListPi2[widget.items.length-i])) {
+            topIndex = widget.items.length-i;
             if(topIndex == 0) data = 0;
             //log("${data} -> ${topIndex}");
           }
-          else if ((angleListPi2[widget.dataList.length] - aradaki_fark < data && data < angleListPi2[widget.dataList.length]) || (topIndex == 1 && angleListPi2[0] - aradaki_fark < data && data < angleListPi2[0])) {
+          else if ((angleListPi2[widget.items.length] - aradaki_fark < data && data < angleListPi2[widget.items.length]) || (topIndex == 1 && angleListPi2[0] - aradaki_fark < data && data < angleListPi2[0])) {
             topIndex = 0;
             //log("${data} -> ${topIndex}");
             data = 0;
@@ -101,13 +102,13 @@ class _CircleBNBState extends State<CircleBNB> {
       else {
         data = data - widget.dragSpeed;
 
-        for (int i = 1; i <= widget.dataList.length-1; i++) {
-          if ((angleListPi2[i] - aradaki_fark < data && data < angleListPi2[i]) || (-angleListPi2[widget.dataList.length-i] - aradaki_fark < data && data < -angleListPi2[widget.dataList.length-i])) {
-            topIndex = widget.dataList.length-i;
+        for (int i = 1; i <= widget.items.length-1; i++) {
+          if ((angleListPi2[i] - aradaki_fark < data && data < angleListPi2[i]) || (-angleListPi2[widget.items.length-i] - aradaki_fark < data && data < -angleListPi2[widget.items.length-i])) {
+            topIndex = widget.items.length-i;
             if(topIndex == 0) data = 0;
             //log("${data} -> ${topIndex}");
           }
-          else if ((topIndex == widget.dataList.length-1 && angleListPi2[0] < data && data < angleListPi2[0] + aradaki_fark) || (-angleListPi2[widget.dataList.length] < data && data < -angleListPi2[widget.dataList.length] + aradaki_fark)) {
+          else if ((topIndex == widget.items.length-1 && angleListPi2[0] < data && data < angleListPi2[0] + aradaki_fark) || (-angleListPi2[widget.items.length] < data && data < -angleListPi2[widget.items.length] + aradaki_fark)) {
             topIndex = 0;
             //log("${data} -> ${topIndex}");
             data = 0;
@@ -176,7 +177,7 @@ class _CircleBNBState extends State<CircleBNB> {
                 setState(() {
                   isDone = true;
                   //log("Drag End : ${angleListPi.length - topIndex}" );
-                  data = angleListPi[angleListPi.length - topIndex > widget.dataList.length-1 ? 0 : angleListPi.length - topIndex];
+                  data = angleListPi[angleListPi.length - topIndex > widget.items.length-1 ? 0 : angleListPi.length - topIndex];
                   //data = double.parse("${angleListPi.length - topIndex}");
                   widget.onChangeIndex(topIndex);
                 });
@@ -195,7 +196,7 @@ class _CircleBNBState extends State<CircleBNB> {
                           color: Colors.black26
                         ),
                         child: Stack(
-                          children: List.generate(widget.dataList.length, (int index) {
+                          children: List.generate(widget.items.length, (int index) {
                             // burdaki alingnment ile daire içerisindeki konumu belirleniyor
                             return AnimatedAlign(
                               duration: const Duration(milliseconds: 700),
@@ -222,22 +223,41 @@ class _CircleBNBState extends State<CircleBNB> {
                                           ? colorList[2]
                                           : colorList[3],
                                       ),
-                                      child: Center(
-                                        child: RotatedBox(
-                                          quarterTurns: index == topIndex ? 0 : 1,
-                                          child: SizedBox(
-                                            width: widget.size.width * 0.25,
-                                            child: Text(
-                                              widget.dataList[index],
-                                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
+                                      child: Align(
+                                        alignment: const Alignment(0, -0.75),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            topIndex == index ? Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  widget.items[index].icon,
+                                                  size: 18,
+                                                  color: Colors.black,
+                                                ),
+                                                const SizedBox(
+                                                  height: 4,
+                                                ),
+                                              ],
+                                            ) : const SizedBox(),
+                                            RotatedBox(
+                                              quarterTurns: index == topIndex ? 0 : 1,
+                                              child: SizedBox(
+                                                width: widget.size.width * 0.3,
+                                                child: Text(
+                                                  widget.items[index].title,
+                                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.fade,
+                                                  textAlign: TextAlign.center,
+                                                ),
                                               ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.fade,
-                                              textAlign: TextAlign.center,
                                             ),
-                                          ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -267,7 +287,7 @@ class _CircleBNBState extends State<CircleBNB> {
                         ),
                         GestureDetector(
                           child: Text(
-                            widget.dataList[topIndex],
+                            widget.items[topIndex].title,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12

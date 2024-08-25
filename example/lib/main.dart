@@ -27,15 +27,15 @@ class _HomePageState extends State<HomePage> {
 
   int _currentIndex = 0;
 
-  List<String> pages = [
-    "Home",
-    "Dashboard",
-    "Profile",
-    "Explore",
-    "Settings",
-    "Notifications",
-    "Saved",
-    "Favorites"
+  List<CircleBNBItem> pages = [
+    CircleBNBItem(title: "Home", icon: Icons.home_outlined),
+    CircleBNBItem(title: "Dashboard", icon: Icons.dashboard_outlined),
+    CircleBNBItem(title: "Profile", icon: Icons.person_outlined),
+    CircleBNBItem(title: "Explore", icon: Icons.explore_outlined),
+    CircleBNBItem(title: "Settings", icon: Icons.settings_outlined),
+    CircleBNBItem(title: "Notifications", icon: Icons.notifications_outlined),
+    CircleBNBItem(title: "Saved", icon: Icons.bookmark_outline_outlined),
+    CircleBNBItem(title: "Favorites", icon: Icons.favorite_outline_outlined),
   ];
 
   @override
@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                 height: MediaQuery.of(context).size.height * 0.5,
                 child: Center(
                   child: Text(
-                    pages[index],
+                    pages[index].title,
                     style: const TextStyle(
                       color: Colors.white
                     ),
@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
           MediaQuery.of(context).size.height * 0.235
         ),
         dragSpeed: 0.05,
-        dataList: pages,
+        items: pages,
         onChangeIndex: (index) {
           setState(() {
             _currentIndex = index;
