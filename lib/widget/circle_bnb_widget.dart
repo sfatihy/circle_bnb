@@ -61,7 +61,6 @@ class _CircleBNBState extends State<CircleBNB> {
 
   @override
   void dispose() {
-
     super.dispose();
   }
 
@@ -111,7 +110,6 @@ class _CircleBNBState extends State<CircleBNB> {
           }
         }
       }
-      widget.onChangeIndex(topIndex);
     });
   }
 
@@ -172,6 +170,7 @@ class _CircleBNBState extends State<CircleBNB> {
                   //log("Drag End : ${angleListPi.length - topIndex}" );
                   data = angleListPi[angleListPi.length - topIndex > 7 ? 0 : angleListPi.length - topIndex];
                   //data = double.parse("${angleListPi.length - topIndex}");
+                  widget.onChangeIndex(topIndex);
                 });
               }),
               child: Stack(
