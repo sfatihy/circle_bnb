@@ -115,6 +115,5 @@ class _HomePageState extends State<HomePage> {
 
 ## Example - Video
 
-<video width="360" height="360" controls>
-  <source src="https://github.com/user-attachments/assets/23d49233-744c-4c45-98d3-13e43a795713" type="video/mp4">
-</video>
+https://github.com/user-attachments/assets/4c604ac0-c1e3-4560-be26-b27b05b1cd1b
+
