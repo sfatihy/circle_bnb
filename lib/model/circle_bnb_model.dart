@@ -5,14 +5,23 @@ import 'package:flutter/material.dart';
 class CircleBNBModel {
 
   late List<Alignment> _alignmentList;
-  late final List<double> _angleListPi;
-  late final List<double> _angleListPi2;
+  late List<double> _angleListPi;
+  late List<double> _angleListPi2;
 
-  CircleBNBModel () {
-    _alignmentList = alignmentList_8;
-    _angleListPi   = angleListPi_8;
-    _angleListPi2  = angleListPi2_8;
+  CircleBNBModel (int itemCount) {
+    _alignmentList = _generateAlignmentList(itemCount);
+    _angleListPi   = _generateAngleListPi(itemCount);
+    _angleListPi2  = _generateAngleListPi2(itemCount);
   }
+
+  /*
+  Alignment Positions:
+  -1,-1       0,-1        1,-1
+
+  -1,0        0,0         1,0
+
+  -1,1        0,1         1,1
+   */
 
   /// stack içerisindeki item ların konumunu ayarlamak için kullanılıyor.
   List<Alignment> get alignmentList => _alignmentList;
@@ -21,38 +30,39 @@ class CircleBNBModel {
   /// döndürme için gerekli sınırları sağlıyor.
   List<double> get angleListPi2 => _angleListPi2;
 
-  List<Alignment> alignmentList_8 = [
-    const Alignment(0, -1),
-    Alignment(sqrt(2) / 2, -sqrt(2) / 2),
-    const Alignment(1, 0),
-    Alignment(sqrt(2) / 2, sqrt(2) / 2),
-    const Alignment(0, 1),
-    Alignment(-sqrt(2) / 2, sqrt(2) / 2),
-    const Alignment(-1, 0),
-    Alignment(-sqrt(2) / 2, -sqrt(2) / 2)
-  ];
+  List<Alignment> _generateAlignmentList(int itemCount) {
+    List<Alignment> alignments = [];
 
-  final List<double> angleListPi_8 = [
-    0,          // 0 - 0
-    pi / 4,     // 7 - 0.7853981633974483
-    pi / 2,     // 6 - 1.5707963267948966
-    pi / 1.33,  // 5 - 2.362099739541198
-    pi,         // 4 - 3.141592653589793
-    -pi / 1.33, // 3 - -2.362099739541198
-    -pi / 2,    // 2 - -1.5707963267948966
-    -pi / 4     // 1 - -0.7853981633974483
-  ];
+    for (int i = 0; i < itemCount; i++) {
+      double angle = (i * 2 * pi / itemCount) - (pi / 2);
+      alignments.add(Alignment(cos(angle), sin(angle)));
+    }
 
-  final List<double> angleListPi2_8 = [
-    0,
-    pi / 4,    //0.7853981633974483
-    pi / 2,    //1.5707963267948966
-    pi / 1.33, //2.362099739541198
-    pi,        //3.141592653589793
-    pi / 0.80, //3.9269908169872414
-    pi / 0.70, //4.487989505128276
-    pi / 0.60, //5.235987755982989
-    pi / 0.53, //5.927533308659987
-  ];
+    return alignments;
+  }
+
+  List<double> _generateAngleListPi(int count) {
+    List<double> angleListPi = [];
+    for (int i = 0; i < count; i++) {
+      if (i <= count / 2) {
+        angleListPi.add(i * pi / (count / 2));
+      }
+      else {
+        angleListPi.add(-((count - i) * pi / (count / 2)));
+      }
+    }
+    return angleListPi;
+  }
+
+  List<double> _generateAngleListPi2(int count) {
+    List<double> angleListPi2 = [];
+    double step = 2 * pi / count;
+
+    for (int i = 0; i <= count; i++) {
+      angleListPi2.add(i * step);
+    }
+
+    return angleListPi2;
+  }
 
 }

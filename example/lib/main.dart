@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
             children: List.generate(
               pages.length,
               (index2) => Container(
-                color: Colors.primaries[index2 + index],
+                color: Colors.primaries[(index + index2 >= 17) ? index2 : index + index2],
                 height: MediaQuery.of(context).size.height * 0.5,
                 child: Center(
                   child: Text(
@@ -77,14 +77,8 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: CircleBNB(
         size: Size(
           MediaQuery.of(context).size.width * 0.75,
-          MediaQuery.of(context).size.height * 0.225
+          MediaQuery.of(context).size.height * 0.235
         ),
-        colorList: [
-          Colors.cyan.shade100,
-          Colors.blue,
-          Colors.green.shade200,
-          Colors.purpleAccent,
-        ],
         dragSpeed: 0.05,
         dataList: pages,
         onChangeIndex: (index) {
