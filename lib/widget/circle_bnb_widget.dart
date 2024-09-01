@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 
-import 'package:circle_bnb/clipper/circle_bnb_clipper.dart';
-import 'package:circle_bnb/model/circle_bnb_item_model.dart';
-import 'package:circle_bnb/model/circle_bnb_model.dart';
+import 'package:circle_bnb/clippers/circle_bnb_clipper.dart';
+import 'package:circle_bnb/enums/navigation_style.dart';
+import 'package:circle_bnb/models/circle_bnb_item_model.dart';
+import 'package:circle_bnb/models/circle_bnb_model.dart';
 
 class CircleBNB extends StatefulWidget {
 
@@ -15,6 +16,8 @@ class CircleBNB extends StatefulWidget {
   final double dragSpeed;
   final List<CircleBNBItem> items;
   final Function (int index) onChangeIndex;
+  final NavigationStyle navigationStyle;
+  final int? linearItemCount;
 
   const CircleBNB({
     super.key,
@@ -22,8 +25,13 @@ class CircleBNB extends StatefulWidget {
     this.colorList,
     required this.dragSpeed,
     required this.items,
-    required this.onChangeIndex
-  }) : assert(colorList == null || colorList.length == 4, 'colorList must be null or have more than 4 elements.');
+    required this.onChangeIndex,
+    this.navigationStyle = NavigationStyle.linear,
+    this.linearItemCount = 3
+  }) : assert(items.length >= 3, 'items must contain more than 3 elements.'),
+       assert(colorList == null || colorList.length == 4, 'colorList must be null or have more than 4 elements.'),
+       assert(linearItemCount == null || (linearItemCount % 2 == 1 && linearItemCount <= 5 && linearItemCount <= items.length), 'linearItemCount must be an odd number, no more than 5 and not greater than the number of items.'),
+       assert(linearItemCount == null || !(navigationStyle == NavigationStyle.linear && linearItemCount > items.length), 'linearItemCount cannot be greater than the number of items when using linear navigation style.');
 
   @override
   State<CircleBNB> createState() => _CircleBNBState();
@@ -37,12 +45,13 @@ class _CircleBNBState extends State<CircleBNB> {
   late List<double> angleListPi2;
   late int topIndex;
   late List<Color> colorList;
+  late bool isLinearLayout;
 
   double data = 0.0;
 
   late DragStartDetails detailsVar;
 
-  double aradaki_fark = 0.25;
+  double difference = 0.25;
   bool isDone = true;
 
   @override
@@ -66,6 +75,8 @@ class _CircleBNBState extends State<CircleBNB> {
       Colors.green.shade200,
       Colors.purpleAccent
     ];
+
+    isLinearLayout = widget.navigationStyle == NavigationStyle.linear;
   }
 
   @override
@@ -81,12 +92,12 @@ class _CircleBNBState extends State<CircleBNB> {
         data = data + widget.dragSpeed;
 
         for (int i = 1; i <= widget.items.length; i++) {
-          if ((angleListPi2[i] - aradaki_fark < data && data < angleListPi2[i]) || (-angleListPi2[widget.items.length-i] - aradaki_fark < data && data < -angleListPi2[widget.items.length-i])) {
+          if ((angleListPi2[i] - difference < data && data < angleListPi2[i]) || (-angleListPi2[widget.items.length-i] - difference < data && data < -angleListPi2[widget.items.length-i])) {
             topIndex = widget.items.length-i;
             if(topIndex == 0) data = 0;
             //log("${data} -> ${topIndex}");
           }
-          else if ((angleListPi2[widget.items.length] - aradaki_fark < data && data < angleListPi2[widget.items.length]) || (topIndex == 1 && angleListPi2[0] - aradaki_fark < data && data < angleListPi2[0])) {
+          else if ((angleListPi2[widget.items.length] - difference < data && data < angleListPi2[widget.items.length]) || (topIndex == 1 && angleListPi2[0] - difference < data && data < angleListPi2[0])) {
             topIndex = 0;
             //log("${data} -> ${topIndex}");
             data = 0;
@@ -96,19 +107,18 @@ class _CircleBNBState extends State<CircleBNB> {
             //log(data.toString());
           }
         }
-        
       }
       // clockwise
       else {
         data = data - widget.dragSpeed;
 
         for (int i = 1; i <= widget.items.length-1; i++) {
-          if ((angleListPi2[i] - aradaki_fark < data && data < angleListPi2[i]) || (-angleListPi2[widget.items.length-i] - aradaki_fark < data && data < -angleListPi2[widget.items.length-i])) {
+          if ((angleListPi2[i] - difference < data && data < angleListPi2[i]) || (-angleListPi2[widget.items.length-i] - difference < data && data < -angleListPi2[widget.items.length-i])) {
             topIndex = widget.items.length-i;
             if(topIndex == 0) data = 0;
             //log("${data} -> ${topIndex}");
           }
-          else if ((topIndex == widget.items.length-1 && angleListPi2[0] < data && data < angleListPi2[0] + aradaki_fark) || (-angleListPi2[widget.items.length] < data && data < -angleListPi2[widget.items.length] + aradaki_fark)) {
+          else if ((topIndex == widget.items.length-1 && angleListPi2[0] < data && data < angleListPi2[0] + difference) || (-angleListPi2[widget.items.length] < data && data < -angleListPi2[widget.items.length] + difference)) {
             topIndex = 0;
             //log("${data} -> ${topIndex}");
             data = 0;
@@ -144,12 +154,48 @@ class _CircleBNBState extends State<CircleBNB> {
       topIndex = clickedIndex;
 
       widget.onChangeIndex(topIndex);
+
+      if(widget.navigationStyle == NavigationStyle.linear) {
+        isLinearLayout = true;
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return isLinearLayout ?
+    BottomNavigationBar(
+      currentIndex: (widget.linearItemCount! - 1) ~/ 2,
+      items: List.generate(widget.linearItemCount!, (index) {
+        int itemIndex = (topIndex + index - (widget.linearItemCount! - 1) ~/ 2) % widget.items.length;
+        return BottomNavigationBarItem(
+          label: widget.items[itemIndex].title,
+          icon: Icon(
+            itemIndex == topIndex ? Icons.arrow_upward : widget.items[itemIndex].icon,
+          ),
+        );
+      }),
+      onTap: (value) {
+        if (value == (widget.linearItemCount! - 1) ~/ 2) {
+          setState(() {
+            isLinearLayout = false;
+          });
+        }
+        else {
+          setState(() {
+            _clickState((topIndex + value - (widget.linearItemCount! - 1) ~/ 2) % widget.items.length);
+
+            /*_clickState(
+              value == 0 ? (topIndex == 0 ? widget.items.length - 2 : topIndex == 1 ? widget.items.length - 1 : topIndex - 2) :
+              value == 1 ? (topIndex == 0 ? widget.items.length - 1 : topIndex - 1) :
+              value == 3 ? (topIndex == widget.items.length - 1 ? 0 : topIndex + 1) :
+              (topIndex == widget.items.length - 1 ? 1 : topIndex + 2)
+            );*/
+          });
+        }
+      },
+    )
+    : SizedBox(
       height: widget.size.height,
       child: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
@@ -160,7 +206,7 @@ class _CircleBNBState extends State<CircleBNB> {
             ),
             GestureDetector(
               dragStartBehavior: DragStartBehavior.start,
-              onHorizontalDragStart: (details) {
+              onHorizontalDragStart: (DragStartDetails details) {
                 //log("**");
                 //log(details.toString());
                 //log("**");
@@ -170,18 +216,22 @@ class _CircleBNBState extends State<CircleBNB> {
                   detailsVar = details;
                 });
               },
-              onHorizontalDragUpdate: (details) {
+              onHorizontalDragUpdate: (DragUpdateDetails details) {
                 _cyclingMechanic(details);
               },
-              onHorizontalDragEnd: ((details) {
+              onHorizontalDragEnd: (DragEndDetails details) {
                 setState(() {
                   isDone = true;
                   //log("Drag End : ${angleListPi.length - topIndex}" );
                   data = angleListPi[angleListPi.length - topIndex > widget.items.length-1 ? 0 : angleListPi.length - topIndex];
                   //data = double.parse("${angleListPi.length - topIndex}");
                   widget.onChangeIndex(topIndex);
+
+                  if(widget.navigationStyle == NavigationStyle.linear) {
+                    isLinearLayout = true;
+                  }
                 });
-              }),
+              },
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -197,14 +247,14 @@ class _CircleBNBState extends State<CircleBNB> {
                         ),
                         child: Stack(
                           children: List.generate(widget.items.length, (int index) {
-                            // burdaki alingnment ile daire içerisindeki konumu belirleniyor
+                            // buradaki alignment ile daire içerisindeki konumu belirleniyor.
                             return AnimatedAlign(
                               duration: const Duration(milliseconds: 700),
                               curve: Curves.easeInOutBack,
                               alignment: (index == topIndex && isDone == true)
                                 ? Alignment(circleBNB!.alignmentList[index].x * 1.3, circleBNB!.alignmentList[index].y * 1.3)
                                 : circleBNB!.alignmentList[index],
-                              // burdaki angle clipper ın angle ı
+                              // buradaki angle clipper ın angle ı
                               child: Transform.rotate(
                                 angle: angleListPi[index],
                                 child: GestureDetector(
@@ -217,9 +267,9 @@ class _CircleBNBState extends State<CircleBNB> {
                                       decoration: BoxDecoration(
                                         color: topIndex == index
                                           ? colorList[0]
-                                          : ((topIndex == index + 1 || topIndex == index - 1) || (topIndex == 0 && index == 7) || (topIndex == 7 && index == 0))
+                                          : ((topIndex == index + 1 || topIndex == index - 1) || (topIndex == 0 && index == widget.items.length - 1) || (topIndex == widget.items.length - 1 && index == 0))
                                           ? colorList[1]
-                                          : ((topIndex == index + 2 || topIndex == index - 2) || (topIndex == 0 && index == 6) || (topIndex == 6 && index == 0) || (topIndex == 7 && index == 1) || (topIndex == 1 && index == 7))
+                                          : ((topIndex == index + 2 || topIndex == index - 2) || (topIndex == 0 && index == widget.items.length - 2) || (topIndex == widget.items.length - 2 && index == 0) || (topIndex == widget.items.length - 1 && index == 1) || (topIndex == 1 && index == widget.items.length - 1))
                                           ? colorList[2]
                                           : colorList[3],
                                       ),
@@ -298,6 +348,10 @@ class _CircleBNBState extends State<CircleBNB> {
                               data = angleListPi[0];
                               topIndex = 0;
                               widget.onChangeIndex(topIndex);
+
+                              if(widget.navigationStyle == NavigationStyle.linear) {
+                                isLinearLayout = true;
+                              }
                             });
                           },
                         ),

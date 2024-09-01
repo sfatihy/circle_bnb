@@ -9,9 +9,30 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      theme: ThemeData(
+        primaryColor: Colors.blue,
+        highlightColor: Colors.transparent,
+        splashColor: Colors.blue.shade200,
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          selectedItemColor: Colors.blue,
+          selectedLabelStyle: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600
+          ),
+          unselectedItemColor: Colors.black38,
+          unselectedLabelStyle: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w300
+          ),
+          showUnselectedLabels: true,
+          backgroundColor: Colors.white,
+          type: BottomNavigationBarType.fixed,
+          elevation: 0,
+        )
+      ),
+      home: const HomePage(),
     );
   }
 }
@@ -49,6 +70,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         backgroundColor: Colors.primaries[_currentIndex],
+        surfaceTintColor: Colors.transparent,
       ),
       body: IndexedStack(
         index: _currentIndex,
@@ -59,11 +81,15 @@ class _HomePageState extends State<HomePage> {
               (index2) => Container(
                 color: Colors.primaries[(index + index2 >= 17) ? index2 : index + index2],
                 height: MediaQuery.of(context).size.height * 0.5,
-                child: Center(
-                  child: Text(
-                    pages[index].title,
-                    style: const TextStyle(
-                      color: Colors.white
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    pages.length,
+                    (index3) => Text(
+                      pages[index3].title,
+                      style: TextStyle(
+                        color: index3 == _currentIndex ? Colors.white : Colors.white24
+                      ),
                     ),
                   )
                 ),
@@ -75,6 +101,8 @@ class _HomePageState extends State<HomePage> {
       extendBody: true,
       backgroundColor: Colors.primaries[_currentIndex],
       bottomNavigationBar: CircleBNB(
+        navigationStyle: NavigationStyle.linear,
+        linearItemCount: 5,
         size: Size(
           MediaQuery.of(context).size.width * 0.75,
           MediaQuery.of(context).size.height * 0.235
@@ -90,4 +118,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
