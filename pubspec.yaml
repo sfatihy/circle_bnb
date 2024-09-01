@@ -1,7 +1,6 @@
 name: circle_bnb
 description: Circle bottom navigation bar.
 version: 0.0.1
-author: Seyit Fatih Yazıcı <seyitfatihyazici11@gmail.com>
 repository: https://github.com/sfatihy/circle_bnb
 
 environment:

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -95,16 +93,12 @@ class _CircleBNBState extends State<CircleBNB> {
           if ((angleListPi2[i] - difference < data && data < angleListPi2[i]) || (-angleListPi2[widget.items.length-i] - difference < data && data < -angleListPi2[widget.items.length-i])) {
             topIndex = widget.items.length-i;
             if(topIndex == 0) data = 0;
-            //log("${data} -> ${topIndex}");
           }
           else if ((angleListPi2[widget.items.length] - difference < data && data < angleListPi2[widget.items.length]) || (topIndex == 1 && angleListPi2[0] - difference < data && data < angleListPi2[0])) {
             topIndex = 0;
-            //log("${data} -> ${topIndex}");
             data = 0;
-            //log("Data dönme değeri 0 landı.");
           }
           else {
-            //log(data.toString());
           }
         }
       }
@@ -116,16 +110,13 @@ class _CircleBNBState extends State<CircleBNB> {
           if ((angleListPi2[i] - difference < data && data < angleListPi2[i]) || (-angleListPi2[widget.items.length-i] - difference < data && data < -angleListPi2[widget.items.length-i])) {
             topIndex = widget.items.length-i;
             if(topIndex == 0) data = 0;
-            //log("${data} -> ${topIndex}");
           }
           else if ((topIndex == widget.items.length-1 && angleListPi2[0] < data && data < angleListPi2[0] + difference) || (-angleListPi2[widget.items.length] < data && data < -angleListPi2[widget.items.length] + difference)) {
             topIndex = 0;
-            //log("${data} -> ${topIndex}");
             data = 0;
-            //log("Data dönme değeri 0 landı.");
           }
           else {
-            //log(data.toString());
+
           }
         }
       }
@@ -133,9 +124,6 @@ class _CircleBNBState extends State<CircleBNB> {
   }
 
   _clickState (clickedIndex) {
-
-    //log("TopIndex: $topIndex");
-    //log("Index: $clickedIndex");
 
     setState(() {
 
@@ -184,13 +172,6 @@ class _CircleBNBState extends State<CircleBNB> {
         else {
           setState(() {
             _clickState((topIndex + value - (widget.linearItemCount! - 1) ~/ 2) % widget.items.length);
-
-            /*_clickState(
-              value == 0 ? (topIndex == 0 ? widget.items.length - 2 : topIndex == 1 ? widget.items.length - 1 : topIndex - 2) :
-              value == 1 ? (topIndex == 0 ? widget.items.length - 1 : topIndex - 1) :
-              value == 3 ? (topIndex == widget.items.length - 1 ? 0 : topIndex + 1) :
-              (topIndex == widget.items.length - 1 ? 1 : topIndex + 2)
-            );*/
           });
         }
       },
@@ -207,10 +188,6 @@ class _CircleBNBState extends State<CircleBNB> {
             GestureDetector(
               dragStartBehavior: DragStartBehavior.start,
               onHorizontalDragStart: (DragStartDetails details) {
-                //log("**");
-                //log(details.toString());
-                //log("**");
-
                 setState(() {
                   isDone = false;
                   detailsVar = details;
@@ -222,9 +199,7 @@ class _CircleBNBState extends State<CircleBNB> {
               onHorizontalDragEnd: (DragEndDetails details) {
                 setState(() {
                   isDone = true;
-                  //log("Drag End : ${angleListPi.length - topIndex}" );
                   data = angleListPi[angleListPi.length - topIndex > widget.items.length-1 ? 0 : angleListPi.length - topIndex];
-                  //data = double.parse("${angleListPi.length - topIndex}");
                   widget.onChangeIndex(topIndex);
 
                   if(widget.navigationStyle == NavigationStyle.linear) {
