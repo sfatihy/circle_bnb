@@ -1,0 +1,144 @@
+import 'package:flutter/material.dart';
+
+import '../enums/navigation_style.dart';
+import '../models/circle_bnb_model.dart';
+import '../widget/circle_bnb_widget.dart';
+
+class CircleBnbController {
+  // --- State Variables (ValueNotifiers) ---
+  // These notify listeners to rebuild the UI when their values change.
+
+  /// The current rotation angle of the circular menu in radians.
+  final data = ValueNotifier<double>(0.0);
+  /// The index of the item currently at the top (active).
+  final topIndex = ValueNotifier<int>(0);
+  /// Tracks if the drag gesture is finished to trigger animations.
+  final isDone = ValueNotifier<bool>(true);
+  /// Toggles between linear and circular navigation styles.
+  final isLinearLayout = ValueNotifier<bool>(false);
+
+  // --- Widget Properties ---
+
+  /// Reference to the parent CircleBNB widget to access its properties.
+  final CircleBNB widget;
+
+  // --- Calculated Properties ---
+
+  /// Geometric model for calculating item positions on the circle.
+  final CircleBNBModel circleBNB;
+  /// List of target rotation angles for each item.
+  final List<double> angleListPi;
+  /// List of angles used for detecting item transitions during drag.
+  final List<double> angleListPi2;
+  /// List of colors for the navigation items.
+  final List<Color> colorList;
+
+  // --- Internal State ---
+
+  /// Stores the starting details of a drag gesture.
+  late DragStartDetails _detailsVar;
+  /// Tolerance value for angle calculations.
+  final double _difference = 0.25;
+
+  /// Constructor to initialize the controller.
+  CircleBnbController(this.widget) :
+    circleBNB = CircleBNBModel(widget.items.length),
+    angleListPi = CircleBNBModel(widget.items.length).angleListPi,
+    angleListPi2 = CircleBNBModel(widget.items.length).angleListPi2,
+    colorList = widget.colorList ??
+      [
+        Colors.cyan.shade100,
+        Colors.blue,
+        Colors.green.shade200,
+        Colors.purpleAccent
+      ]
+    {
+      isLinearLayout.value = widget.navigationStyle == NavigationStyle.linear;
+    }
+
+  /// Disposes the ValueNotifiers to free up resources.
+  void dispose() {
+    data.dispose();
+    topIndex.dispose();
+    isDone.dispose();
+    isLinearLayout.dispose();
+  }
+
+  /// Handles the rotation logic during a horizontal drag gesture.
+  void cyclingMechanic(DragUpdateDetails details) {
+    // counter-clockwise drag
+    if (details.localPosition.dx.floorToDouble() > _detailsVar.localPosition.dx.floorToDouble()) {
+      data.value = data.value + widget.dragSpeed;
+    }
+    // clockwise drag
+    else {
+      data.value = data.value - widget.dragSpeed;
+    }
+
+    // This loop determines which item is at the top based on the current rotation angle.
+    for (int i = 1; i <= widget.items.length; i++) {
+      if ((angleListPi2[i] - _difference < data.value && data.value < angleListPi2[i]) ||
+          (-angleListPi2[widget.items.length - i] - _difference < data.value &&
+              data.value < -angleListPi2[widget.items.length - i])) {
+        topIndex.value = widget.items.length - i;
+        if (topIndex.value == 0) data.value = 0;
+      } else if ((angleListPi2[widget.items.length] - _difference < data.value &&
+          data.value < angleListPi2[widget.items.length]) ||
+          (topIndex.value == 1 &&
+              angleListPi2[0] - _difference < data.value &&
+              data.value < angleListPi2[0])) {
+        topIndex.value = 0;
+        data.value = 0;
+      }
+    }
+  }
+
+  /// Rotates the menu to the selected item when it's clicked.
+  void clickState(int clickedIndex) {
+    // Set the rotation angle based on the clicked item's index.
+    if (clickedIndex == 0) {
+      data.value = 0.0;
+    } else {
+      data.value = angleListPi[angleListPi.length - clickedIndex];
+    }
+
+    topIndex.value = clickedIndex;
+    widget.onChangeIndex(topIndex.value); // Notify the parent widget of the index change.
+
+    // Switch to linear layout if the style is set to linear.
+    if (widget.navigationStyle == NavigationStyle.linear) {
+      isLinearLayout.value = true;
+    }
+  }
+
+  /// Called when a drag gesture starts.
+  void onDragStart(DragStartDetails details) {
+    isDone.value = false; // Mark dragging as active.
+    _detailsVar = details; // Store start position.
+  }
+
+  /// Called when a drag gesture ends.
+  void onDragEnd(DragEndDetails details) {
+    isDone.value = true; // Mark dragging as finished.
+    // Snap the wheel to the final top item's position.
+    data.value = angleListPi[(angleListPi.length - topIndex.value) % angleListPi.length];
+    widget.onChangeIndex(topIndex.value);
+
+    // Switch to linear layout if the style is set to linear.
+    if (widget.navigationStyle == NavigationStyle.linear) {
+      isLinearLayout.value = true;
+    }
+  }
+
+  /// Handles tap on the center text, resetting the wheel to the first item.
+  void onCenterTextTap() {
+    data.value = angleListPi[0]; // Reset angle.
+    topIndex.value = 0; // Reset index.
+    widget.onChangeIndex(topIndex.value);
+
+    // Switch to linear layout if the style is set to linear.
+    if (widget.navigationStyle == NavigationStyle.linear) {
+      isLinearLayout.value = true;
+    }
+  }
+}
