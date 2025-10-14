@@ -122,11 +122,11 @@ class _CircleItem extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () => controller.clickState(index),
                   child: ClipPath(
-                    clipper: CircleBottomNavigationBarClipper(),
+                    clipper: CircleBottomNavigationBarClipper(itemCount: controller.widget.items.length),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 500),
-                      height: controller.widget.size.width / 2.5,
-                      width: controller.widget.size.width / 2.5,
+                      height: controller.widget.size.width,
+                      width: controller.widget.size.width,
                       decoration: BoxDecoration(
                         color: _getItemColor(topIndex, index, controller.widget.items.length, controller.colorList),
                       ),

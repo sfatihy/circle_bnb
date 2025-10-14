@@ -75,22 +75,19 @@ class CircleBnbController {
       data.value = data.value - widget.dragSpeed;
     }
 
-    // This loop determines which item is at the top based on the current rotation angle.
-    for (int i = 1; i <= widget.items.length; i++) {
-      if ((angleListPi2[i] - _difference < data.value && data.value < angleListPi2[i]) ||
-          (-angleListPi2[widget.items.length - i] - _difference < data.value &&
-              data.value < -angleListPi2[widget.items.length - i])) {
-        topIndex.value = widget.items.length - i;
-        if (topIndex.value == 0) data.value = 0;
-      } else if ((angleListPi2[widget.items.length] - _difference < data.value &&
-          data.value < angleListPi2[widget.items.length]) ||
-          (topIndex.value == 1 &&
-              angleListPi2[0] - _difference < data.value &&
-              data.value < angleListPi2[0])) {
-        topIndex.value = 0;
-        data.value = 0;
-      }
-    }
+    final itemCount = widget.items.length;
+    final step = 2 * 3.141592653589793 / itemCount; // 2 * pi
+
+    // Calculate index based on the rotation angle.
+    // The angle is divided by the step angle for each item, and rounded to the nearest whole number.
+    // This gives the index of the item that is closest to the top position.
+    final rawIndex = -data.value / step;
+    final snappedIndex = rawIndex.round();
+
+    // Normalize the index to ensure it's within the valid range [0, itemCount - 1].
+    // The modulo operator (%) handles wrapping around, and adding itemCount before the modulo
+    // ensures the result is always positive.
+    topIndex.value = (snappedIndex % itemCount + itemCount) % itemCount;
   }
 
   /// Rotates the menu to the selected item when it's clicked.
