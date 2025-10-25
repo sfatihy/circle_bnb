@@ -19,7 +19,7 @@ class CircularNavigationWidget extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         child: Column(
           children: [
-            const SizedBox(height: 36),
+            SizedBox(height: controller.widget.size.height * 0.15),
             GestureDetector(
               dragStartBehavior: DragStartBehavior.start,
               onHorizontalDragStart: controller.onDragStart,
@@ -111,59 +111,63 @@ class _CircleItem extends StatelessWidget {
           builder: (context, isDone, _) {
             final isTop = index == topIndex;
 
-            return AnimatedAlign(
-              duration: const Duration(milliseconds: 700),
-              curve: Curves.easeInOutBack,
-              alignment: (isTop && isDone)
-                ? Alignment(controller.circleBNB.alignmentList[index].x * 1.3, controller.circleBNB.alignmentList[index].y * 1.3)
-                : controller.circleBNB.alignmentList[index],
-              child: Transform.rotate(
-                angle: controller.angleListPi[index],
-                child: GestureDetector(
-                  onTap: () => controller.clickState(index),
-                  child: ClipPath(
-                    clipper: CircleBottomNavigationBarClipper(itemCount: controller.widget.items.length),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      height: controller.widget.size.width,
-                      width: controller.widget.size.width,
-                      decoration: BoxDecoration(
-                        color: _getItemColor(topIndex, index, controller.widget.items.length, controller.colorList),
-                      ),
-                      child: Align(
-                        alignment: const Alignment(0, -0.75),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: isTop ? 4 : 0,
-                          children: [
-                            if (isTop)
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    controller.widget.items[index].icon,
-                                    size: 18,
-                                    color: Colors.black,
+            return OverflowBox(
+              maxWidth: controller.widget.size.width * ((isDone && isTop) ? 1.15 : 1),
+              maxHeight: controller.widget.size.width * ((isDone && isTop) ? 1.15 : 1),
+              child: AnimatedAlign(
+                duration: const Duration(milliseconds: 700),
+                curve: Curves.easeInOutBack,
+                alignment: (isDone && isTop)
+                  ? Alignment(controller.circleBNB.alignmentList[index].x * 1.15, controller.circleBNB.alignmentList[index].y * 1.15)
+                  : controller.circleBNB.alignmentList[index],
+                child: Transform.rotate(
+                  angle: controller.angleListPi[index],
+                  child: GestureDetector(
+                    onTap: () => controller.clickState(index),
+                    child: ClipPath(
+                      clipper: CircleBottomNavigationBarClipper(itemCount: controller.widget.items.length),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        height: controller.widget.size.width,
+                        width: controller.widget.size.width,
+                        decoration: BoxDecoration(
+                          color: _getItemColor(topIndex, index, controller.widget.items.length, controller.colorList),
+                        ),
+                        child: Align(
+                          alignment: const Alignment(0, -0.75),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            spacing: isTop ? 4 : 0,
+                            children: [
+                              if (isTop)
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      controller.widget.items[index].icon,
+                                      size: 18,
+                                      color: Colors.black,
+                                    ),
+                                  ],
+                                ),
+                              RotatedBox(
+                                quarterTurns: isTop ? 0 : 1,
+                                child: SizedBox(
+                                  width: controller.widget.size.width * 0.3,
+                                  child: Text(
+                                    controller.widget.items[index].title,
+                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.fade,
+                                    textAlign: TextAlign.center,
                                   ),
-                                ],
-                              ),
-                            RotatedBox(
-                              quarterTurns: isTop ? 0 : 1,
-                              child: SizedBox(
-                                width: controller.widget.size.width * 0.3,
-                                child: Text(
-                                  controller.widget.items[index].title,
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.fade,
-                                  textAlign: TextAlign.center,
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -185,32 +189,11 @@ class _CenterContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 36.0),
-      child: Column(
-        spacing: 8,
-        children: [
-          const Icon(
-            Icons.arrow_upward,
-            size: 12,
-            color: Colors.white,
-          ),
-          GestureDetector(
-            onTap: controller.onCenterTextTap,
-            child: ValueListenableBuilder<int>(
-              valueListenable: controller.topIndex,
-              builder: (context, topIndex, child) {
-                return Text(
-                  controller.widget.items[topIndex].title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+    return IconButton.filledTonal(
+      onPressed: controller.onCenterTextTap,
+      icon: const Icon(
+        Icons.arrow_upward,
+        size: 24,
       ),
     );
   }

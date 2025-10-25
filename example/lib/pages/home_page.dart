@@ -62,9 +62,9 @@ class HomePage extends StatelessWidget {
           extendBody: true,
           backgroundColor: Colors.primaries[currentIndex % Colors.primaries.length],
           bottomNavigationBar: CircleBNB(
-            navigationStyle: NavigationStyle.linear,
+            navigationStyle: NavigationStyle.circular,
             linearItemCount: 5,
-            size: Size(MediaQuery.of(context).size.width * 0.75, MediaQuery.of(context).size.height * 0.235),
+            size: Size(MediaQuery.of(context).size.width * 0.75, MediaQuery.of(context).size.height * 0.25),
             dragSpeed: 0.05,
             items: pages,
             onChangeIndex: (index) {
