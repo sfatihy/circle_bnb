@@ -159,49 +159,50 @@ class _CircleItem extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: _getItemColor(topIndex, index, controller.widget.items.length, controller.colorList),
                         ),
-                        child: Align(
-                          alignment: const Alignment(0, -0.75),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: ((isTop && controller.widget.showTextWhenSelected) || (!isTop && controller.widget.showTextWhenUnselected)) ? 8.0 : 32.0
+                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
-                            spacing: isTop ? 4 : 0,
                             children: [
-                              if (isTop)
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      controller.widget.items[index].icon,
-                                      size: 18,
-                                      color: Colors.black,
-                                    ),
-                                  ],
+                              if ((isTop && controller.widget.showIconWhenSelected) || (!isTop && controller.widget.showIconWhenUnselected))
+                                Icon(
+                                  controller.widget.items[index].icon,
+                                  size: 24,
+                                  color: controller.widget.items[index].iconColor ?? (isTop ? controller.widget.selectedIconColor : controller.widget.unselectedIconColor) ?? Colors.black,
                                 ),
-                              TweenAnimationBuilder<double>(
-                                tween: Tween<double>(end: quarterTurns * pi / 2),
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                builder: (context, angle, child) {
-                                  return Transform.rotate(
-                                    angle: angle,
-                                    child: child,
-                                  );
-                                },
-                                child: SizedBox(
-                                  width: controller.widget.size.width * (index == topIndex ? 0.2 : 0.275),
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      controller.widget.items[index].title,
-                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                              if ((isTop && controller.widget.showTextWhenSelected) || (!isTop && controller.widget.showTextWhenUnselected))
+                                Padding(
+                                  padding: EdgeInsets.only(top: isTop ? 4.0 : (controller.widget.showIconWhenUnselected ? 8.0 : 0.0)),
+                                  child: TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(end: quarterTurns * pi / 2),
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                    builder: (context, angle, child) {
+                                      return Transform.rotate(
+                                        angle: angle,
+                                        child: child,
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      width: controller.widget.size.width * 0.275 - (isTop ? 24 : 16),
+                                      height: controller.widget.size.width * 0.275 - 16,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          controller.widget.items[index].title,
+                                          style: controller.widget.items[index].textStyle ?? (isTop ? controller.widget.selectedTextStyle : controller.widget.unselectedTextStyle) ?? Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 1,
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
-                                      maxLines: 1,
-                                      textAlign: TextAlign.center,
                                     ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
                         ),

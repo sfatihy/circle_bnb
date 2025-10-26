@@ -19,6 +19,14 @@ class CircleBNB extends StatefulWidget {
   final Function (int index) onChangeIndex;
   final NavigationStyle navigationStyle;
   final int? linearItemCount;
+  final bool showIconWhenSelected;
+  final bool showIconWhenUnselected;
+  final bool showTextWhenSelected;
+  final bool showTextWhenUnselected;
+  final Color? selectedIconColor;
+  final TextStyle? selectedTextStyle;
+  final Color? unselectedIconColor;
+  final TextStyle? unselectedTextStyle;
 
   const CircleBNB({
     super.key,
@@ -28,11 +36,21 @@ class CircleBNB extends StatefulWidget {
     required this.items,
     required this.onChangeIndex,
     this.navigationStyle = NavigationStyle.linear,
-    this.linearItemCount = 3
+    this.linearItemCount = 3,
+    this.showIconWhenSelected = true,
+    this.showIconWhenUnselected = true,
+    this.showTextWhenSelected = true,
+    this.showTextWhenUnselected = true,
+    this.selectedIconColor,
+    this.selectedTextStyle,
+    this.unselectedIconColor,
+    this.unselectedTextStyle,
   }) : assert(items.length >= 3, 'items must contain more than 3 elements.'),
        assert(colorList == null || colorList.length == 4, 'colorList must be null or have more than 4 elements.'),
        assert(linearItemCount == null || (linearItemCount % 2 == 1 && linearItemCount <= 5 && linearItemCount <= items.length), 'linearItemCount must be an odd number, no more than 5 and not greater than the number of items.'),
-       assert(linearItemCount == null || !(navigationStyle == NavigationStyle.linear && linearItemCount > items.length), 'linearItemCount cannot be greater than the number of items when using linear navigation style.');
+       assert(linearItemCount == null || !(navigationStyle == NavigationStyle.linear && linearItemCount > items.length), 'linearItemCount cannot be greater than the number of items when using linear navigation style.'),
+       assert(showIconWhenSelected || showTextWhenSelected, 'showIconWhenSelected and showTextWhenSelected cannot both be false.'),
+       assert(showIconWhenUnselected || showTextWhenUnselected, 'showIconWhenUnselected and showTextWhenUnselected cannot both be false.');
 
   @override
   State<CircleBNB> createState() => _CircleBNBState();

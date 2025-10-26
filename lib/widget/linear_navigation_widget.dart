@@ -17,12 +17,17 @@ class LinearNavigationWidget extends StatelessWidget {
           items: List.generate(controller.widget.linearItemCount!, (index) {
             int itemIndex = (topIndex + index - (controller.widget.linearItemCount! - 1) ~/ 2) % controller.widget.items.length;
             return BottomNavigationBarItem(
-              label: controller.widget.items[itemIndex].title,
-              icon: Icon(
-                itemIndex == topIndex
-                  ? Icons.arrow_upward
-                  : controller.widget.items[itemIndex].icon,
-              ),
+              label: ((itemIndex == topIndex && controller.widget.showTextWhenSelected) || (itemIndex != topIndex && controller.widget.showTextWhenUnselected))
+                ? controller.widget.items[itemIndex].title
+                : '',
+              icon: ((itemIndex == topIndex && controller.widget.showIconWhenSelected) || (itemIndex != topIndex && controller.widget.showIconWhenUnselected))
+                ? Icon(
+                    itemIndex == topIndex
+                      ? Icons.arrow_upward
+                      : controller.widget.items[itemIndex].icon,
+                    size: (itemIndex != topIndex && !controller.widget.showTextWhenUnselected) ? 30.0 : null,
+                  )
+                : const SizedBox.shrink(),
             );
           }),
           onTap: (value) {
