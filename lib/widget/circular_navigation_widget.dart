@@ -118,6 +118,25 @@ class _CircleItem extends StatelessWidget {
           builder: (context, isDone, _) {
             final isTop = index == topIndex;
 
+            final itemCount = controller.widget.items.length;
+            int offset = index - topIndex;
+            if (offset > itemCount / 2) {
+              offset -= itemCount;
+            } else if (offset < -itemCount / 2) {
+              offset += itemCount;
+            }
+
+            int quarterTurns;
+            if (isTop) {
+              quarterTurns = 0;
+            } else if (offset > 0) {
+              // Left side
+              quarterTurns = -1;
+            } else {
+              // Right side (and bottom)
+              quarterTurns = 1;
+            }
+
             return OverflowBox(
               maxWidth: controller.widget.size.width * ((isDone && isTop) ? 1.15 : 1),
               maxHeight: controller.widget.size.width * ((isDone && isTop) ? 1.15 : 1),
@@ -157,19 +176,29 @@ class _CircleItem extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                              RotatedBox(
-                                quarterTurns: isTop ? 0 : 1,
+                              TweenAnimationBuilder<double>(
+                                tween: Tween<double>(end: quarterTurns * pi / 2),
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                builder: (context, angle, child) {
+                                  return Transform.rotate(
+                                    angle: angle,
+                                    child: child,
+                                  );
+                                },
                                 child: SizedBox(
-                                  width: controller.widget.size.width * 0.3,
-                                  child: Text(
-                                    controller.widget.items[index].title,
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
+                                  width: controller.widget.size.width * (index == topIndex ? 0.2 : 0.275),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      controller.widget.items[index].title,
+                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      maxLines: 1,
+                                      textAlign: TextAlign.center,
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.fade,
-                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
