@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../enums/navigation_style.dart';
@@ -37,8 +39,6 @@ class CircleBnbController {
 
   /// Stores the starting details of a drag gesture.
   late DragStartDetails _detailsVar;
-  /// Tolerance value for angle calculations.
-  final double _difference = 0.25;
 
   /// Constructor to initialize the controller.
   CircleBnbController(this.widget) :
@@ -76,7 +76,7 @@ class CircleBnbController {
     }
 
     final itemCount = widget.items.length;
-    final step = 2 * 3.141592653589793 / itemCount; // 2 * pi
+    final step = 2 * pi / itemCount; // 2 * pi
 
     // Calculate index based on the rotation angle.
     // The angle is divided by the step angle for each item, and rounded to the nearest whole number.
@@ -92,13 +92,14 @@ class CircleBnbController {
 
   /// Rotates the menu to the selected item when it's clicked.
   void clickState(int clickedIndex) {
-    // Set the rotation angle based on the clicked item's index.
-    if (clickedIndex == 0) {
-      data.value = 0.0;
-    } else {
-      data.value = angleListPi[angleListPi.length - clickedIndex];
-    }
+    final itemCount = widget.items.length;
+    final step = 2 * pi / itemCount;
 
+    final canonicalAngle = -clickedIndex * step;
+    final k = ((data.value - canonicalAngle) / (2 * pi)).round();
+    final targetAngle = canonicalAngle + k * (2 * pi);
+
+    data.value = targetAngle;
     topIndex.value = clickedIndex;
     widget.onChangeIndex(topIndex.value); // Notify the parent widget of the index change.
 
@@ -118,7 +119,12 @@ class CircleBnbController {
   void onDragEnd(DragEndDetails details) {
     isDone.value = true; // Mark dragging as finished.
     // Snap the wheel to the final top item's position.
-    data.value = angleListPi[(angleListPi.length - topIndex.value) % angleListPi.length];
+    final itemCount = widget.items.length;
+    final step = 2 * pi / itemCount;
+    final rawIndex = -data.value / step;
+    final snappedIndex = rawIndex.round();
+
+    data.value = -snappedIndex * step;
     widget.onChangeIndex(topIndex.value);
 
     // Switch to linear layout if the style is set to linear.

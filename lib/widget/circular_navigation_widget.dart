@@ -50,9 +50,16 @@ class _RotatingWheel extends StatelessWidget {
     return ValueListenableBuilder<double>(
       valueListenable: controller.data,
       builder: (context, dataValue, child) {
-        return Transform.rotate(
-          angle: dataValue,
-          child: child,
+        return ValueListenableBuilder<bool>(
+          valueListenable: controller.isDone,
+          builder: (context, isDone, _) {
+            return AnimatedRotation(
+              turns: dataValue / (2 * pi),
+              duration: isDone ? const Duration(milliseconds: 700) : Duration.zero,
+              curve: Curves.easeInOut,
+              child: child,
+            );
+          },
         );
       },
       child: Center(
@@ -116,7 +123,7 @@ class _CircleItem extends StatelessWidget {
               maxHeight: controller.widget.size.width * ((isDone && isTop) ? 1.15 : 1),
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 700),
-                curve: Curves.easeInOutBack,
+                curve: Curves.easeInOut,
                 alignment: (isDone && isTop)
                   ? Alignment(controller.circleBNB.alignmentList[index].x * 1.15, controller.circleBNB.alignmentList[index].y * 1.15)
                   : controller.circleBNB.alignmentList[index],
