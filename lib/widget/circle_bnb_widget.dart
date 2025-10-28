@@ -13,20 +13,50 @@ import '../widget/linear_navigation_widget.dart';
 @immutable
 class CircleBNB extends StatefulWidget {
 
+  /// The size of the widget. If not provided, it will be calculated automatically.
   final Size size;
+
+  /// The list of colors for the background gradient. Must contain 4 colors.
   final List<Color>? colorList;
+
+  /// The speed of the dragging animation.
   final double dragSpeed;
+
+  /// The list of items to be displayed in the navigation bar. Must contain at least 3 items.
   final List<CircleBNBItem> items;
-  final Function (int index) onChangeIndex;
+
+  /// A callback function that is called when the selected index changes.
+  final Function(int index) onChangeIndex;
+
+  /// The style of the navigation bar. Can be `NavigationStyle.linear` or `NavigationStyle.circular`.
   final NavigationStyle navigationStyle;
+
+  /// The number of items to display when `navigationStyle` is `NavigationStyle.linear`.
+  /// Must be an odd number between 3 and 5.
   final int? linearItemCount;
+
+  /// Whether to show the icon of the selected item.
   final bool showIconWhenSelected;
+
+  /// Whether to show the icons of unselected items.
   final bool showIconWhenUnselected;
+
+  /// Whether to show the text of the selected item.
   final bool showTextWhenSelected;
+
+  /// Whether to show the text of unselected items.
   final bool showTextWhenUnselected;
+
+  /// The color of the selected item's icon.
   final Color? selectedIconColor;
+
+  /// The text style for the selected item's label.
   final TextStyle? selectedTextStyle;
+
+  /// The color of unselected items' icons.
   final Color? unselectedIconColor;
+
+  /// The text style for unselected items' labels.
   final TextStyle? unselectedTextStyle;
 
   const CircleBNB({
