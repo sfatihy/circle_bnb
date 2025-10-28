@@ -19,7 +19,7 @@ class CircularNavigationWidget extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         child: Column(
           children: [
-            SizedBox(height: controller.widget.size.height * 0.15),
+            const SizedBox(height: 32),
             GestureDetector(
               dragStartBehavior: DragStartBehavior.start,
               onHorizontalDragStart: controller.onDragStart,

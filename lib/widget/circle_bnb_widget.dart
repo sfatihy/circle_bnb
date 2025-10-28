@@ -10,6 +10,7 @@ import '../models/circle_bnb_item_model.dart';
 import '../widget/circular_navigation_widget.dart';
 import '../widget/linear_navigation_widget.dart';
 
+@immutable
 class CircleBNB extends StatefulWidget {
 
   final Size size;
@@ -30,7 +31,7 @@ class CircleBNB extends StatefulWidget {
 
   const CircleBNB({
     super.key,
-    required this.size,
+    this.size = Size.zero,
     this.colorList,
     required this.dragSpeed,
     required this.items,
@@ -58,16 +59,51 @@ class CircleBNB extends StatefulWidget {
 
 class _CircleBNBState extends State<CircleBNB> {
   late final CircleBnbController _controller;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = CircleBnbController(widget);
-
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      _isInitialized = true;
+
+      Size finalSize;
+      if (widget.size == Size.zero) {
+        finalSize = Size(MediaQuery.of(context).size.width * 0.85, 215 + MediaQuery.of(context).padding.bottom * 0.75);
+      } else {
+        finalSize = widget.size;
+      }
+
+      final CircleBNB effectiveWidget = CircleBNB(
+        key: widget.key,
+        size: finalSize,
+        colorList: widget.colorList,
+        dragSpeed: widget.dragSpeed,
+        items: widget.items,
+        onChangeIndex: widget.onChangeIndex,
+        navigationStyle: widget.navigationStyle,
+        linearItemCount: widget.linearItemCount,
+        showIconWhenSelected: widget.showIconWhenSelected,
+        showIconWhenUnselected: widget.showIconWhenUnselected,
+        showTextWhenSelected: widget.showTextWhenSelected,
+        showTextWhenUnselected: widget.showTextWhenUnselected,
+        selectedIconColor: widget.selectedIconColor,
+        selectedTextStyle: widget.selectedTextStyle,
+        unselectedIconColor: widget.unselectedIconColor,
+        unselectedTextStyle: widget.unselectedTextStyle,
+      );
+
+      _controller = CircleBnbController(effectiveWidget);
+    }
   }
 
   @override
