@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -105,35 +107,66 @@ class _CircleBNBState extends State<CircleBNB> {
     super.didChangeDependencies();
     if (!_isInitialized) {
       _isInitialized = true;
-
-      Size finalSize;
-      if (widget.size == Size.zero) {
-        finalSize = Size(MediaQuery.of(context).size.width * 0.85, 215 + MediaQuery.of(context).padding.bottom * 0.75);
-      } else {
-        finalSize = widget.size;
-      }
-
-      final CircleBNB effectiveWidget = CircleBNB(
-        key: widget.key,
-        size: finalSize,
-        colorList: widget.colorList,
-        dragSpeed: widget.dragSpeed,
-        items: widget.items,
-        onChangeIndex: widget.onChangeIndex,
-        navigationStyle: widget.navigationStyle,
-        linearItemCount: widget.linearItemCount,
-        showIconWhenSelected: widget.showIconWhenSelected,
-        showIconWhenUnselected: widget.showIconWhenUnselected,
-        showTextWhenSelected: widget.showTextWhenSelected,
-        showTextWhenUnselected: widget.showTextWhenUnselected,
-        selectedIconColor: widget.selectedIconColor,
-        selectedTextStyle: widget.selectedTextStyle,
-        unselectedIconColor: widget.unselectedIconColor,
-        unselectedTextStyle: widget.unselectedTextStyle,
-      );
-
-      _controller = CircleBnbController(effectiveWidget);
+      _initializeController();
     }
+  }
+
+  @override
+  void didUpdateWidget(CircleBNB oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reinitialize controller when items count changes
+    if (oldWidget.items.length != widget.items.length) {
+      // Store the current top index before disposing
+      final currentIndex = _controller.topIndex.value;
+
+      // Dispose old controller
+      _controller.dispose();
+
+      // Reinitialize with new item count
+      _initializeController();
+
+      // Reset topIndex to a safe value if it's out of bounds
+      if (currentIndex >= widget.items.length) {
+        _controller.topIndex.value = 0;
+        _controller.data.value = 0.0;
+        widget.onChangeIndex(0);
+      } else {
+        _controller.topIndex.value = currentIndex;
+        // Recalculate the data angle for the current index
+        final step = 2 * pi / widget.items.length;
+        _controller.data.value = -currentIndex * step;
+      }
+    }
+  }
+
+  void _initializeController() {
+    Size finalSize;
+    if (widget.size == Size.zero) {
+      finalSize = Size(MediaQuery.of(context).size.width * 0.85, 215 + MediaQuery.of(context).padding.bottom * 0.75);
+    } else {
+      finalSize = widget.size;
+    }
+
+    final CircleBNB effectiveWidget = CircleBNB(
+      key: widget.key,
+      size: finalSize,
+      colorList: widget.colorList,
+      dragSpeed: widget.dragSpeed,
+      items: widget.items,
+      onChangeIndex: widget.onChangeIndex,
+      navigationStyle: widget.navigationStyle,
+      linearItemCount: widget.linearItemCount,
+      showIconWhenSelected: widget.showIconWhenSelected,
+      showIconWhenUnselected: widget.showIconWhenUnselected,
+      showTextWhenSelected: widget.showTextWhenSelected,
+      showTextWhenUnselected: widget.showTextWhenUnselected,
+      selectedIconColor: widget.selectedIconColor,
+      selectedTextStyle: widget.selectedTextStyle,
+      unselectedIconColor: widget.unselectedIconColor,
+      unselectedTextStyle: widget.unselectedTextStyle,
+    );
+
+    _controller = CircleBnbController(effectiveWidget);
   }
 
   @override
