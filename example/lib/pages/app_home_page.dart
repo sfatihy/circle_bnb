@@ -1,68 +1,6 @@
-# circle_bnb
-This package allows to make a circled bottom navigation bar at the bottom of the screen.
-
-## Getting Started
-Add this to your package's pubspec.yaml file:
-
-```pubspec
-dependencies:
-  circle_bnb: ^0.0.3
-```
-
-## Usage
-Then you just have to import the package with
-
-```dart
-import 'package:circle_bnb/circle_bnb.dart';
-```
-
-## Properties
-
-Here is a list of properties you can use to customize the `CircleBNB` widget:
-
-*   `size` (`Size`): The size of the widget. If not provided, it will be calculated automatically.
-*   `colorList` (`List<Color>?`): The list of colors for the background gradient. Must contain 4 colors.
-*   `dragSpeed` (`double`): The speed of the dragging animation.
-*   `items` (`List<CircleBNBItem>`): The list of items to be displayed in the navigation bar. Must contain at least 3 items.
-*   `onChangeIndex` (`Function(int index)`): A callback function that is called when the selected index changes.
-*   `navigationStyle` (`NavigationStyle`): The style of the navigation bar. Can be `NavigationStyle.linear` or `NavigationStyle.circular`.
-*   `linearItemCount` (`int?`): The number of items to display when `navigationStyle` is `NavigationStyle.linear`. Must be an odd number between 3 and 5.
-*   `showIconWhenSelected` (`bool`): Whether to show the icon of the selected item.
-*   `showIconWhenUnselected` (`bool`): Whether to show the icons of unselected items.
-*   `showTextWhenSelected` (`bool`): Whether to show the text of the selected item.
-*   `showTextWhenUnselected` (`bool`): Whether to show the text of unselected items.
-*   `selectedIconColor` (`Color?`): The color of the selected item's icon.
-*   `selectedTextStyle` (`TextStyle?`): The text style for the selected item's label.
-*   `unselectedIconColor` (`Color?`): The color of unselected items' icons.
-*   `unselectedTextStyle` (`TextStyle?`): The text style for unselected items' labels.
-*   `circularBackgroundColor` (`Color?`): The background color of the widget as a circular.
-*   `linearBackgroundColor` (`Color?`): The background color of the widget as a linear.
-
-## Example
-
-```dart
 import 'package:flutter/material.dart';
 
 import 'package:circle_bnb/circle_bnb.dart';
-
-void main() => runApp(const App());
-
-class App extends StatelessWidget {
-  const App({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        highlightColor: Colors.transparent,
-        splashColor: Colors.blue.shade200,
-      ),
-      home: const AppHomePage(),
-    );
-  }
-}
 
 class AppHomePage extends StatefulWidget {
   const AppHomePage({super.key});
@@ -207,7 +145,7 @@ class _AppHomePageState extends State<AppHomePage> {
                       },
                       activeColor: Colors.primaries[_bnbIndex % Colors.primaries.length].shade900,
                       inactiveThumbColor: Colors.primaries[_bnbIndex % Colors.primaries.length].shade900,
-                      inactiveTrackColor: Colors.white.withOpacity(0.75),
+                      inactiveTrackColor: Colors.white.withValues(alpha: 0.75),
                     ),
                     SizedBox(
                       width: 48,
@@ -286,13 +224,3 @@ class _AppHomePageState extends State<AppHomePage> {
     );
   }
 }
-```
-
-## Example - Video
-- navigationStyle: NavigationStyle.circular
-
-https://github.com/user-attachments/assets/dd3425b9-54a9-4a5e-8253-f90c0e7d5188
-
-- navigationStyle: NavigationStyle.linear
-
-https://github.com/user-attachments/assets/ce3245d4-3f42-4741-afcb-dd9356e3cf2a

@@ -19,7 +19,7 @@ class CircularNavigationWidget extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         child: Column(
           children: [
-            const SizedBox(height: 36),
+            const SizedBox(height: 32),
             GestureDetector(
               dragStartBehavior: DragStartBehavior.start,
               onHorizontalDragStart: controller.onDragStart,
@@ -50,18 +50,25 @@ class _RotatingWheel extends StatelessWidget {
     return ValueListenableBuilder<double>(
       valueListenable: controller.data,
       builder: (context, dataValue, child) {
-        return Transform.rotate(
-          angle: dataValue,
-          child: child,
+        return ValueListenableBuilder<bool>(
+          valueListenable: controller.isDone,
+          builder: (context, isDone, _) {
+            return AnimatedRotation(
+              turns: dataValue / (2 * pi),
+              duration: isDone ? const Duration(milliseconds: 700) : Duration.zero,
+              curve: Curves.easeInOut,
+              child: child,
+            );
+          },
         );
       },
       child: Center(
         child: Container(
           width: controller.widget.size.width,
           height: controller.widget.size.width,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.black26,
+            color: controller.widget.circularBackgroundColor ?? Colors.black26,
           ),
           child: Stack(
             children: List.generate(controller.widget.items.length, (int index) {
@@ -111,59 +118,93 @@ class _CircleItem extends StatelessWidget {
           builder: (context, isDone, _) {
             final isTop = index == topIndex;
 
-            return AnimatedAlign(
-              duration: const Duration(milliseconds: 700),
-              curve: Curves.easeInOutBack,
-              alignment: (isTop && isDone)
-                ? Alignment(controller.circleBNB.alignmentList[index].x * 1.3, controller.circleBNB.alignmentList[index].y * 1.3)
-                : controller.circleBNB.alignmentList[index],
-              child: Transform.rotate(
-                angle: controller.angleListPi[index],
-                child: GestureDetector(
-                  onTap: () => controller.clickState(index),
-                  child: ClipPath(
-                    clipper: CircleBottomNavigationBarClipper(),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      height: controller.widget.size.width / 2.5,
-                      width: controller.widget.size.width / 2.5,
-                      decoration: BoxDecoration(
-                        color: _getItemColor(topIndex, index, controller.widget.items.length, controller.colorList),
-                      ),
-                      child: Align(
-                        alignment: const Alignment(0, -0.75),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: isTop ? 4 : 0,
-                          children: [
-                            if (isTop)
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    controller.widget.items[index].icon,
-                                    size: 18,
-                                    color: Colors.black,
-                                  ),
-                                ],
-                              ),
-                            RotatedBox(
-                              quarterTurns: isTop ? 0 : 1,
-                              child: SizedBox(
-                                width: controller.widget.size.width * 0.3,
-                                child: Text(
-                                  controller.widget.items[index].title,
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.fade,
-                                  textAlign: TextAlign.center,
+            final itemCount = controller.widget.items.length;
+            int offset = index - topIndex;
+            if (offset > itemCount / 2) {
+              offset -= itemCount;
+            } else if (offset < -itemCount / 2) {
+              offset += itemCount;
+            }
+
+            int quarterTurns;
+            if (isTop) {
+              quarterTurns = 0;
+            } else if (offset > 0) {
+              // Left side
+              quarterTurns = -1;
+            } else {
+              // Right side (and bottom)
+              quarterTurns = 1;
+            }
+
+            return OverflowBox(
+              maxWidth: controller.widget.size.width * ((isDone && isTop) ? 1.15 : 1),
+              maxHeight: controller.widget.size.width * ((isDone && isTop) ? 1.15 : 1),
+              child: AnimatedAlign(
+                duration: const Duration(milliseconds: 700),
+                curve: Curves.easeInOut,
+                alignment: (isDone && isTop)
+                  ? Alignment(controller.circleBNB.alignmentList[index].x * 1.15, controller.circleBNB.alignmentList[index].y * 1.15)
+                  : controller.circleBNB.alignmentList[index],
+                child: Transform.rotate(
+                  angle: controller.angleListPi[index],
+                  child: GestureDetector(
+                    onTap: () => controller.clickState(index),
+                    child: ClipPath(
+                      clipper: CircleBottomNavigationBarClipper(itemCount: controller.widget.items.length),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        height: controller.widget.size.width,
+                        width: controller.widget.size.width,
+                        decoration: BoxDecoration(
+                          color: _getItemColor(topIndex, index, controller.widget.items.length, controller.colorList),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: ((isTop && controller.widget.showTextWhenSelected) || (!isTop && controller.widget.showTextWhenUnselected)) ? 8.0 : 32.0
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if ((isTop && controller.widget.showIconWhenSelected) || (!isTop && controller.widget.showIconWhenUnselected))
+                                Icon(
+                                  controller.widget.items[index].icon,
+                                  size: 24,
+                                  color: controller.widget.items[index].iconColor ?? (isTop ? controller.widget.selectedIconColor : controller.widget.unselectedIconColor) ?? Colors.black,
                                 ),
-                              ),
-                            ),
-                          ],
+                              if ((isTop && controller.widget.showTextWhenSelected) || (!isTop && controller.widget.showTextWhenUnselected))
+                                Padding(
+                                  padding: EdgeInsets.only(top: isTop ? 4.0 : (controller.widget.showIconWhenUnselected ? 8.0 : 0.0)),
+                                  child: TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(end: quarterTurns * pi / 2),
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                    builder: (context, angle, child) {
+                                      return Transform.rotate(
+                                        angle: angle,
+                                        child: child,
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      width: controller.widget.size.width * 0.275 - (isTop ? 24 : 16),
+                                      height: controller.widget.size.width * 0.275 - 16,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          controller.widget.items[index].title,
+                                          style: controller.widget.items[index].textStyle ?? (isTop ? controller.widget.selectedTextStyle : controller.widget.unselectedTextStyle) ?? Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 1,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -185,32 +226,11 @@ class _CenterContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 36.0),
-      child: Column(
-        spacing: 8,
-        children: [
-          const Icon(
-            Icons.arrow_upward,
-            size: 12,
-            color: Colors.white,
-          ),
-          GestureDetector(
-            onTap: controller.onCenterTextTap,
-            child: ValueListenableBuilder<int>(
-              valueListenable: controller.topIndex,
-              builder: (context, topIndex, child) {
-                return Text(
-                  controller.widget.items[topIndex].title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+    return IconButton.filledTonal(
+      onPressed: controller.onCenterTextTap,
+      icon: const Icon(
+        Icons.arrow_upward,
+        size: 24,
       ),
     );
   }

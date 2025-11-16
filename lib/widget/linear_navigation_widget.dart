@@ -13,16 +13,35 @@ class LinearNavigationWidget extends StatelessWidget {
       valueListenable: controller.topIndex,
       builder: (context, topIndex, child) {
         return BottomNavigationBar(
+          showSelectedLabels: controller.widget.showTextWhenSelected,
+          selectedLabelStyle: controller.widget.selectedTextStyle,
+          selectedItemColor: controller.widget.selectedTextStyle?.color,
+          selectedIconTheme: IconThemeData(
+            color: controller.widget.selectedIconColor ?? controller.colorList.first
+          ),
+          showUnselectedLabels: controller.widget.showTextWhenUnselected,
+          unselectedLabelStyle: controller.widget.unselectedTextStyle,
+          unselectedItemColor: controller.widget.unselectedTextStyle?.color,
+          unselectedIconTheme: IconThemeData(
+            color: controller.widget.unselectedIconColor ?? controller.colorList[1]
+          ),
           currentIndex: (controller.widget.linearItemCount! - 1) ~/ 2,
           items: List.generate(controller.widget.linearItemCount!, (index) {
             int itemIndex = (topIndex + index - (controller.widget.linearItemCount! - 1) ~/ 2) % controller.widget.items.length;
             return BottomNavigationBarItem(
-              label: controller.widget.items[itemIndex].title,
-              icon: Icon(
-                itemIndex == topIndex
-                  ? Icons.arrow_upward
-                  : controller.widget.items[itemIndex].icon,
-              ),
+              tooltip: controller.widget.items[itemIndex].title,
+              backgroundColor: controller.widget.linearBackgroundColor ?? Colors.white70,
+              label: ((itemIndex == topIndex && controller.widget.showTextWhenSelected) || (itemIndex != topIndex && controller.widget.showTextWhenUnselected))
+                ? controller.widget.items[itemIndex].title
+                : '',
+              icon: ((itemIndex == topIndex && controller.widget.showIconWhenSelected) || (itemIndex != topIndex && controller.widget.showIconWhenUnselected))
+                ? Icon(
+                    itemIndex == topIndex
+                      ? Icons.arrow_upward
+                      : controller.widget.items[itemIndex].icon,
+                    size: (itemIndex != topIndex && !controller.widget.showTextWhenUnselected) ? 30.0 : null,
+                  )
+                : const SizedBox.shrink(),
             );
           }),
           onTap: (value) {
