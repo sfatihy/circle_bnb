@@ -1,6 +1,6 @@
 name: circle_bnb
 description: A customizable circular bottom navigation bar for Flutter apps with smooth animations and multiple style options.
-version: 0.0.2
+version: 0.0.3
 repository: https://github.com/sfatihy/circle_bnb
 
 environment:
