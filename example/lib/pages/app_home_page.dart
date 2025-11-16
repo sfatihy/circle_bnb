@@ -22,8 +22,8 @@ class _AppHomePageState extends State<AppHomePage> {
     CircleBNBItem(title: "Notifications", icon: Icons.notifications_outlined),
     CircleBNBItem(title: "Saved", icon: Icons.bookmark_outline_outlined),
     CircleBNBItem(title: "Favorites", icon: Icons.favorite_outline_outlined),
-    CircleBNBItem(title: "Saved", icon: Icons.bookmark_outline_outlined),
-    CircleBNBItem(title: "Favorites", icon: Icons.favorite_outline_outlined),
+    CircleBNBItem(title: "Search", icon: Icons.search_outlined),
+    CircleBNBItem(title: "Cart", icon: Icons.shopping_cart_outlined),
   ];
 
   void setBnbIndex(int index) {
