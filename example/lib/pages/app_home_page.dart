@@ -1,5 +1,6 @@
-import 'package:circle_bnb/circle_bnb.dart';
 import 'package:flutter/material.dart';
+
+import 'package:circle_bnb/circle_bnb.dart';
 
 class AppHomePage extends StatefulWidget {
   const AppHomePage({super.key});
@@ -11,6 +12,7 @@ class AppHomePage extends StatefulWidget {
 class _AppHomePageState extends State<AppHomePage> {
 
   int _bnbIndex = 0;
+  NavigationStyle _navigationStyle = NavigationStyle.circular;
   final List<CircleBNBItem> _items = [
     CircleBNBItem(title: "Home", icon: Icons.home_outlined),
     CircleBNBItem(title: "Dashboard", icon: Icons.dashboard_outlined),
@@ -70,7 +72,7 @@ class _AppHomePageState extends State<AppHomePage> {
         centerTitle: true,
         backgroundColor: Colors.primaries[_bnbIndex % Colors.primaries.length],
         bottom: PreferredSize(
-          preferredSize: const Size(double.infinity, 48),
+          preferredSize: const Size(double.infinity, 96),
           child: ColoredBox(
             color: Colors.primaries[_bnbIndex % Colors.primaries.length],
             child: Column(
@@ -115,6 +117,53 @@ class _AppHomePageState extends State<AppHomePage> {
                     ),
                   ],
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 4,
+                  children: [
+                    SizedBox(
+                      width: 48,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'Linear',
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: Colors.primaries[_bnbIndex % Colors.primaries.length].shade900,
+                            fontWeight: _navigationStyle == NavigationStyle.linear
+                              ? FontWeight.bold
+                              : FontWeight.normal
+                          ),
+                        ),
+                      ),
+                    ),
+                    Switch(
+                      value: _navigationStyle == NavigationStyle.circular,
+                      onChanged: (value) {
+                        setState(() {
+                          _navigationStyle = value ? NavigationStyle.circular : NavigationStyle.linear;
+                        });
+                      },
+                      activeColor: Colors.primaries[_bnbIndex % Colors.primaries.length].shade900,
+                      inactiveThumbColor: Colors.primaries[_bnbIndex % Colors.primaries.length].shade900,
+                      inactiveTrackColor: Colors.white.withValues(alpha: 0.75),
+                    ),
+                    SizedBox(
+                      width: 48,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'Circular',
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: Colors.primaries[_bnbIndex % Colors.primaries.length].shade900,
+                            fontWeight: _navigationStyle == NavigationStyle.circular
+                              ? FontWeight.bold
+                              : FontWeight.normal
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -148,11 +197,28 @@ class _AppHomePageState extends State<AppHomePage> {
       extendBody: true,
       backgroundColor: Colors.primaries[_bnbIndex % Colors.primaries.length],
       bottomNavigationBar: CircleBNB(
-        key: ValueKey(_items.length),
-        navigationStyle: NavigationStyle.circular,
+        key: ValueKey('${_items.length}_$_navigationStyle'),
+        navigationStyle: _navigationStyle,
         linearItemCount: 5,
         dragSpeed: 0.05,
         items: _items,
+        colorList: const [
+          Color(0xFFFF9B54),
+          Color(0xFFFF7F51),
+          Color(0xFFCE4257),
+          Color(0xFF720026),
+        ],
+        linearBackgroundColor: const Color(0xFFFF9B54),
+        selectedIconColor: Colors.black87,
+        unselectedIconColor: Colors.black38,
+        selectedTextStyle: const TextStyle(
+          color: Color(0xFF4F000B),
+          fontWeight: FontWeight.bold,
+        ),
+        unselectedTextStyle: const TextStyle(
+          color: Colors.black38,
+          fontWeight: FontWeight.normal,
+        ),
         onChangeIndex: setBnbIndex,
       ),
     );

@@ -61,6 +61,13 @@ class CircleBNB extends StatefulWidget {
   /// The text style for unselected items' labels.
   final TextStyle? unselectedTextStyle;
 
+  /// The background color of the widget as a circular.
+  final Color? circularBackgroundColor;
+
+  /// The background color of the widget as a linear.
+  final Color? linearBackgroundColor;
+
+
   const CircleBNB({
     super.key,
     this.size = Size.zero,
@@ -78,6 +85,8 @@ class CircleBNB extends StatefulWidget {
     this.selectedTextStyle,
     this.unselectedIconColor,
     this.unselectedTextStyle,
+    this.circularBackgroundColor,
+    this.linearBackgroundColor,
   }) : assert(items.length >= 3, 'items must contain more than 3 elements.'),
        assert(colorList == null || colorList.length == 4, 'colorList must be null or have more than 4 elements.'),
        assert(linearItemCount == null || (linearItemCount % 2 == 1 && linearItemCount <= 5 && linearItemCount <= items.length), 'linearItemCount must be an odd number, no more than 5 and not greater than the number of items.'),
@@ -164,6 +173,8 @@ class _CircleBNBState extends State<CircleBNB> {
       selectedTextStyle: widget.selectedTextStyle,
       unselectedIconColor: widget.unselectedIconColor,
       unselectedTextStyle: widget.unselectedTextStyle,
+      circularBackgroundColor: widget.circularBackgroundColor,
+      linearBackgroundColor: widget.linearBackgroundColor,
     );
 
     _controller = CircleBnbController(effectiveWidget);

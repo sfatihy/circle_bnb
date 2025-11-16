@@ -66,9 +66,9 @@ class _RotatingWheel extends StatelessWidget {
         child: Container(
           width: controller.widget.size.width,
           height: controller.widget.size.width,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.black26,
+            color: controller.widget.circularBackgroundColor ?? Colors.black26,
           ),
           child: Stack(
             children: List.generate(controller.widget.items.length, (int index) {
