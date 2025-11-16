@@ -291,8 +291,8 @@ class _AppHomePageState extends State<AppHomePage> {
 ## Example - Video
 - navigationStyle: NavigationStyle.circular
 
-https://github.com/user-attachments/assets/3f4dd67c-171a-4764-a452-3196cb8df22d
+https://github.com/user-attachments/assets/dd3425b9-54a9-4a5e-8253-f90c0e7d5188
 
 - navigationStyle: NavigationStyle.linear
 
-https://github.com/user-attachments/assets/a8b735cd-d763-4cf5-a11e-37b55b5f848b
+https://github.com/user-attachments/assets/ce3245d4-3f42-4741-afcb-dd9356e3cf2a
